@@ -7,7 +7,9 @@
           <h1 class="card-title">{{ .Title }}</h1>
         </div>
         <div class="card-body">
-          {{- if $.Site.Params.contact.endpoint -}}
+          {{- if eq $.Site.Params.contact.endpoint "https://api.staticforms.xyz/submit" -}}
+            {{- partial "contact/form-staticforms" . -}}
+          {{- else if $.Site.Params.contact.endpoint -}}
             {{- partial "contact/form" . -}}
           {{- else -}}
             {{- partial "contact/form-netlify" . -}}

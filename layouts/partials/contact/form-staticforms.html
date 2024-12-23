@@ -1,0 +1,38 @@
+<form id="contactForm" class="needs-validation" name="contact" method="POST" enctype="multipart/form-data"
+    action="{{ $.Site.Params.contact.endpoint }}" novalidate>
+    {{- partial "contact/fields" . -}}
+
+    {{- if $.Site.Params.contact.accessKey -}}
+    <input id="contactAccessKey" type="hidden" name="accessKey" value="{{ $.Site.Params.contact.accessKey }}">
+    {{- end -}}
+
+    <button id="contactSubmit" type="button" class="btn btn-outline-primary">{{ "button_submit" | i18n }}</button>
+</form>
+
+<script>
+    document.getElementById('contactSubmit').addEventListener('click', function() {
+        // 第一步：创建XMLHttpRequest对象
+        var xhr = new XMLHttpRequest();
+        // 第二步：注册回调函数
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    console.log(xhr.responseText);
+                } else {
+                    console.error('Error: ' + xhr.status);
+                }
+            }
+        }
+
+        // 第三步：开启通道
+        xhr.open("POST", document.getElementById("contactForm").getAttribute("action"), true)
+        // 第四步：发送请求
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+        var name = document.getElementById("contactName").value;
+        var email = document.getElementById("contactEmail").value;
+        var subject = document.getElementById("contactSubject").value;
+        var message = document.getElementById("contactMessage").value;
+        var accessKey = document.getElementById("contactAccessKey").value;
+        xhr.send("name="+name+"&email="+email+"&%24subject="+subject+"&message="+message+"&accessKey="+accessKey)
+    });
+</script>
