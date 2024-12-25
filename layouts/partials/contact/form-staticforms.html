@@ -2,14 +2,12 @@
     action="{{ $.Site.Params.contact.endpoint }}" novalidate>
     {{- partial "contact/fields" . -}}
 
+    <input id="contactHoneypot" type="text" name="honeypot" style="display: none;">
     {{- if $.Site.Params.contact.accessKey -}}
     <input id="contactAccessKey" type="hidden" name="accessKey" value="{{ $.Site.Params.contact.accessKey }}">
     {{- end -}}
 
-    <button id="contactSubmit" type="button" class="btn btn-outline-primary" style="position: relative;">
-        {{ "button_submit" | i18n }}
-        <span id="contactLoading"></span>
-    </button>
+    <button id="contactSubmit" type="button" class="btn btn-outline-primary" style="position: relative;">{{ "button_submit" | i18n }}</button>
 </form>
 
 <div id="success-modal" class="modal fade">
@@ -35,8 +33,8 @@
 </div>
 
 <style>
-.load-effect {
-  font-size: 8px;
+.loading-effect::before {
+  font-size: 0.5em;
   width: 1em;
   height: 1em;
   border-radius: 50%;
@@ -47,6 +45,7 @@
   left: calc(50% - 0.5em);
   top: calc(50% - 0.5em);
   z-index: 999999;
+  content: '';
 }
 
 @keyframes load5 {
@@ -80,8 +79,7 @@
 
 <script>
     var form = document.getElementById("contactForm")
-    var submit = document.getElementById('contactSubmit');
-    var loading = document.getElementById("contactLoading")
+    var submit = document.getElementById('contactSubmit')
 
     submit.addEventListener('click', function() {
         // 校验
@@ -93,7 +91,7 @@
 
         // 防止重复提交
         submit.setAttribute("disabled", "disabled")
-        loading.classList.add("load-effect")
+        submit.classList.add("loading-effect")
 
         // 第一步：创建XMLHttpRequest对象
         var xhr = new XMLHttpRequest();
@@ -112,7 +110,7 @@
                     document.getElementById('submit-error').click()
                 }
                 submit.removeAttribute("disabled")
-                loading.classList.remove("load-effect")
+                submit.classList.remove("loading-effect")
             }
         }
 
@@ -126,6 +124,7 @@
         var subject = document.getElementById("contactSubject").value;
         var message = document.getElementById("contactMessage").value;
         var accessKey = document.getElementById("contactAccessKey").value;
-        xhr.send("name="+name+"&email="+email+"&%24subject="+subject+"&message="+message+"&accessKey="+accessKey)
+        var honeypot = document.getElementById("contactHoneypot").value;
+        xhr.send("name="+name+"&email="+email+"&%24subject="+subject+"&message="+message+"&honeypot="+honeypot+"&accessKey="+accessKey)
     });
 </script>
