@@ -230,7 +230,7 @@ other = "创建于 {{ .createdOn }}{{ with .updatedOn }}，更新于 {{ . }}{{ e
 other = "文章"
 
 [profile]
-other = "Profile"
+other = "简介"
 
 [read_more]
 other = "阅读更多"
@@ -407,7 +407,7 @@ other = "目录"
 other = "标签"
 
 [taxonomies]
-other = "Taxonomies"
+other = "文章归类"
 
 [theme_auto]
 other = "自动"
