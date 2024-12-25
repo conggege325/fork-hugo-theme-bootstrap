@@ -6,26 +6,119 @@
     <input id="contactAccessKey" type="hidden" name="accessKey" value="{{ $.Site.Params.contact.accessKey }}">
     {{- end -}}
 
-    <button id="contactSubmit" type="button" class="btn btn-outline-primary">{{ "button_submit" | i18n }}</button>
+    <button id="contactSubmit" type="button" class="btn btn-outline-primary" style="position: relative;">
+        {{ "button_submit" | i18n }}
+        <span id="contactLoading"></span>
+    </button>
 </form>
 
+<div id="success-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="alert alert-dismissible fade show alert-success" role="alert" style="margin: 0;">
+                提交成功！
+                <button id="submit-success" type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#success-modal"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="error-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="alert alert-dismissible fade show alert-danger" role="alert" style="margin: 0;">
+                提交失败！请稍后再试。
+                <button id="submit-error" type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#error-modal"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.load-effect {
+  font-size: 8px;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  position: absolute;
+  text-indent: -9999em;
+  animation: load5 1.1s infinite ease;
+  transform: translateZ(0);
+  left: calc(50% - 0.5em);
+  top: calc(50% - 0.5em);
+  z-index: 999999;
+}
+
+@keyframes load5 {
+  0%,
+  100% {
+    box-shadow: 0em -2.6em 0em 0em #616161, 1.8em -1.8em 0 0em rgba(97,97,97, 0.2), 2.5em 0em 0 0em rgba(97,97,97, 0.2), 1.75em 1.75em 0 0em rgba(97,97,97, 0.2), 0em 2.5em 0 0em rgba(97,97,97, 0.2), -1.8em 1.8em 0 0em rgba(97,97,97, 0.2), -2.6em 0em 0 0em rgba(97,97,97, 0.5), -1.8em -1.8em 0 0em rgba(97,97,97, 0.7);
+  }
+  12.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(97,97,97, 0.7), 1.8em -1.8em 0 0em #616161, 2.5em 0em 0 0em rgba(97,97,97, 0.2), 1.75em 1.75em 0 0em rgba(97,97,97, 0.2), 0em 2.5em 0 0em rgba(97,97,97, 0.2), -1.8em 1.8em 0 0em rgba(97,97,97, 0.2), -2.6em 0em 0 0em rgba(97,97,97, 0.2), -1.8em -1.8em 0 0em rgba(97,97,97, 0.5);
+  }
+  25% {
+    box-shadow: 0em -2.6em 0em 0em rgba(97,97,97, 0.5), 1.8em -1.8em 0 0em rgba(97,97,97, 0.7), 2.5em 0em 0 0em #616161, 1.75em 1.75em 0 0em rgba(97,97,97, 0.2), 0em 2.5em 0 0em rgba(97,97,97, 0.2), -1.8em 1.8em 0 0em rgba(97,97,97, 0.2), -2.6em 0em 0 0em rgba(97,97,97, 0.2), -1.8em -1.8em 0 0em rgba(97,97,97, 0.2);
+  }
+  37.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(97,97,97, 0.2), 1.8em -1.8em 0 0em rgba(97,97,97, 0.5), 2.5em 0em 0 0em rgba(97,97,97, 0.7), 1.75em 1.75em 0 0em #616161, 0em 2.5em 0 0em rgba(97,97,97, 0.2), -1.8em 1.8em 0 0em rgba(97,97,97, 0.2), -2.6em 0em 0 0em rgba(97,97,97, 0.2), -1.8em -1.8em 0 0em rgba(97,97,97, 0.2);
+  }
+  50% {
+    box-shadow: 0em -2.6em 0em 0em rgba(97,97,97, 0.2), 1.8em -1.8em 0 0em rgba(97,97,97, 0.2), 2.5em 0em 0 0em rgba(97,97,97, 0.5), 1.75em 1.75em 0 0em rgba(97,97,97, 0.7), 0em 2.5em 0 0em #616161, -1.8em 1.8em 0 0em rgba(97,97,97, 0.2), -2.6em 0em 0 0em rgba(97,97,97, 0.2), -1.8em -1.8em 0 0em rgba(97,97,97, 0.2);
+  }
+  62.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(97,97,97, 0.2), 1.8em -1.8em 0 0em rgba(97,97,97, 0.2), 2.5em 0em 0 0em rgba(97,97,97, 0.2), 1.75em 1.75em 0 0em rgba(97,97,97, 0.5), 0em 2.5em 0 0em rgba(97,97,97, 0.7), -1.8em 1.8em 0 0em #616161, -2.6em 0em 0 0em rgba(97,97,97, 0.2), -1.8em -1.8em 0 0em rgba(97,97,97, 0.2);
+  }
+  75% {
+    box-shadow: 0em -2.6em 0em 0em rgba(97,97,97, 0.2), 1.8em -1.8em 0 0em rgba(97,97,97, 0.2), 2.5em 0em 0 0em rgba(97,97,97, 0.2), 1.75em 1.75em 0 0em rgba(97,97,97, 0.2), 0em 2.5em 0 0em rgba(97,97,97, 0.5), -1.8em 1.8em 0 0em rgba(97,97,97, 0.7), -2.6em 0em 0 0em #616161, -1.8em -1.8em 0 0em rgba(97,97,97, 0.2);
+  }
+  87.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(97,97,97, 0.2), 1.8em -1.8em 0 0em rgba(97,97,97, 0.2), 2.5em 0em 0 0em rgba(97,97,97, 0.2), 1.75em 1.75em 0 0em rgba(97,97,97, 0.2), 0em 2.5em 0 0em rgba(97,97,97, 0.2), -1.8em 1.8em 0 0em rgba(97,97,97, 0.5), -2.6em 0em 0 0em rgba(97,97,97, 0.7), -1.8em -1.8em 0 0em #616161;
+  }
+}
+</style>
+
 <script>
-    document.getElementById('contactSubmit').addEventListener('click', function() {
+    var form = document.getElementById("contactForm")
+    var submit = document.getElementById('contactSubmit');
+    var loading = document.getElementById("contactLoading")
+
+    submit.addEventListener('click', function() {
+        // 校验
+        var checkResult = form.checkValidity()
+        if (!checkResult) {
+            form.classList.add('was-validated')
+            return
+        }
+
+        // 防止重复提交
+        submit.setAttribute("disabled", "disabled")
+        loading.classList.add("load-effect")
+
         // 第一步：创建XMLHttpRequest对象
         var xhr = new XMLHttpRequest();
+
         // 第二步：注册回调函数
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    console.log(xhr.responseText);
+                if (xhr.status === 200 ) {
+                    var result = JSON.parse(xhr.responseText)
+                    if(result.success) {
+                        document.getElementById('submit-success').click()
+                    }else {
+                        document.getElementById('submit-error').click()
+                    }
                 } else {
-                    console.error('Error: ' + xhr.status);
+                    document.getElementById('submit-error').click()
                 }
+                submit.removeAttribute("disabled")
+                loading.classList.remove("load-effect")
             }
         }
 
         // 第三步：开启通道
-        xhr.open("POST", document.getElementById("contactForm").getAttribute("action"), true)
+        xhr.open("POST", form.getAttribute("action"), true)
+
         // 第四步：发送请求
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
         var name = document.getElementById("contactName").value;
