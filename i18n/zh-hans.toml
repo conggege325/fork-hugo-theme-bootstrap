@@ -131,7 +131,7 @@ other = "名称"
 other = "邮箱"
 
 [contact_email_help]
-other = "我们不会泄露你的邮箱地址。"
+other = "请放心，我不会泄露你的邮箱地址。"
 
 [contact_file]
 other = "文件"
