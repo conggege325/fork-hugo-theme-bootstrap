@@ -14,7 +14,7 @@ class CodeBlock {
 
   maxHeight: number;
 
-  maxLines = 7;
+  maxLines = 20;
 
   lineNos = true;
 
