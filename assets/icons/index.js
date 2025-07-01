@@ -215,5 +215,17 @@ let icons = [
 ];
 
 config.searchPseudoElements = false; // This option will become a performance killer, especially in search page, it tooks a long time to render.
-library.add(...icons.concat(customIcons));
+// library.add(...icons.concat(customIcons));
+
+import * as brands from "@fortawesome/free-brands-svg-icons";
+library.add(...Object.values(brands.fab));
+
+import * as regular from "@fortawesome/free-regular-svg-icons";
+library.add(...Object.values(regular.far));
+
+import * as solid from  "@fortawesome/free-solid-svg-icons";
+library.add(...Object.values(solid.fas));
+
+library.add(...customIcons);
+
 dom.watch();
