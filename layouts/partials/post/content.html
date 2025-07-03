@@ -1,19 +1,63 @@
-{{- $isPrivate := .Params.isPrivate -}}
-{{- if ne $isPrivate true -}}
-    {{- $isPrivate = false -}}
-{{- end -}}
+{{ $passwd := .Params.passwd | default "" }}
+
+<div class="position-fixed top-0 start-50 translate-middle-x" style="z-index: 99999; padding-top: 10px;">
+    <div id="passwd_error_toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+        <div class="alert alert-danger" role="alert" style="margin: 0;">
+            <h6 class="alert-heading">密码错误!</h6>
+            <div>您无权查看该文章。</div>
+        </div>
+    </div>
+</div>
 
 <div class="post-content mb-3" data-bs-spy="scroll" data-bs-target="#TableOfContents" tabindex="0">
     {{- if and .Summary (default false $.Site.Params.post.readMoreFromContent) (hasPrefix .Content .Summary) }}
         <div id="post-summary">{{ .Summary }}</div>
         <div id="post-content-body">
-            {{- if $isPrivate -}}
+            {{- if ne $passwd "" -}}
+                <div class="secret_content">
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">友情提示</h4>
+                        <p>该文章属于私密文章；请联系作者获取密码。</p>
+                    </div>
+                    <form id="validationForm" class="row g-3 needs-validation" novalidate>
+                        <div class="col-12">
+                            <input type="password" class="form-control" id="validationPassword" required placeholder="请输入密码">
+                            <div class="invalid-feedback">密码不能为空</div>
+                        </div>
+                        <div class="col-12" style="text-align: right;">
+                            <button class="btn btn-primary" type="submit">确定</button>
+                        </div>
+                    </form>
+                </div>
                 <script>
                     {{- $safeContent := strings.TrimPrefix .Summary .Content | safeHTML | string -}}
-                    const ciphertext = '{{- aes_enc $safeContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
+                    const ciphertext = '{{- aes_enc $safeContent .Params.passwd $.Site.Params.secretIv -}}'
                     document.addEventListener('show_content', function(e) {
                         const originalText = decrypt(ciphertext, e.detail)
-                        $('#post-content-body').append(originalText)
+                        if (originalText == null) {
+                            const toast = new bootstrap.Toast(document.getElementById('passwd_error_toast'));
+                            toast.show();
+                        } else {
+                            $('#post-content-body').append(originalText)
+                            $('.secret_content').hide()
+                        }
+                    });
+                    $(function() {
+                        $("#validationForm").submit(function(e) {
+                            const form = e.target
+                            if (form.checkValidity()) {
+                                let secretKey = $('#validationPassword')[0].value;
+                                if (secretKey.length > 32) {
+                                    secretKey = secretKey.substring(0, 32)
+                                } else if(secretKey.length < 32) {
+                                    secretKey = secretKey.padEnd(32, '0')
+                                }
+                                const event = new CustomEvent('show_content', { detail: secretKey });
+                                document.dispatchEvent(event);
+                            }
+                            e.preventDefault()
+                            e.stopPropagation()
+                        });
                     });
                 </script>
             {{- else -}}
@@ -22,13 +66,51 @@
         </div>
     {{- else }}
         <div id="post-content-body">
-            {{- if $isPrivate -}}
+            {{- if ne $passwd "" -}}
+                <div class="secret_content">
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">友情提示</h4>
+                        <p>该文章属于私密文章；请联系作者获取密码。</p>
+                    </div>
+                    <form id="validationForm" class="row g-3 needs-validation" novalidate>
+                        <div class="col-12">
+                            <input type="password" class="form-control" id="validationPassword" required placeholder="请输入密码">
+                            <div class="invalid-feedback">密码不能为空</div>
+                        </div>
+                        <div class="col-12" style="text-align: right;">
+                            <button class="btn btn-primary" type="submit">确定</button>
+                        </div>
+                    </form>
+                </div>
                 <script>
                     {{- $unsafeContent := .Content | string -}}
-                    const ciphertext = '{{- aes_enc $unsafeContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
+                    const ciphertext = '{{- aes_enc $unsafeContent .Params.passwd $.Site.Params.secretIv -}}'
                     document.addEventListener('show_content', function(e) {
                         const originalText = decrypt(ciphertext, e.detail)
-                        $('#post-content-body').append(originalText)
+                        if (originalText == null) {
+                            const toast = new bootstrap.Toast(document.getElementById('passwd_error_toast'));
+                            toast.show();
+                        } else {
+                            $('#post-content-body').append(originalText)
+                            $('.secret_content').hide()
+                        }
+                    });
+                    $(function() {
+                        $("#validationForm").submit(function(e) {
+                            const form = e.target
+                            if (form.checkValidity()) {
+                                let secretKey = $('#validationPassword')[0].value;
+                                if (secretKey.length > 32) {
+                                    secretKey = secretKey.substring(0, 32)
+                                } else if(secretKey.length < 32) {
+                                    secretKey = secretKey.padEnd(32, '0')
+                                }
+                                const event = new CustomEvent('show_content', { detail: secretKey });
+                                document.dispatchEvent(event);
+                            }
+                            e.preventDefault()
+                            e.stopPropagation()
+                        });
                     });
                 </script>
             {{- else -}}

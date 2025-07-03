@@ -1,66 +1,24 @@
 {{ define "content" }}
 {{- partial "docs/nav" . -}}
 
-{{- if eq .Params.isPrivate true -}}
+{{ $passwd := .Params.passwd | default "" }}
+{{- if ne $passwd "" -}}
 <script>
-  let myModal;
-  $(function() {
-    myModal = new bootstrap.Modal('#staticBackdrop', {
-      keyboard: false
-    })
-    myModal.show()
-
-    $("#validationForm").submit(function(e) {
-      const form = e.target
-      if (form.checkValidity()) {
-        let secretKey = $('#validationPassword')[0].value;
-        if (secretKey.length > 32) {
-          secretKey = secretKey.substring(0, 32)
-        } else if(secretKey.length < 32) {
-          secretKey = secretKey.padEnd(32, '0')
-        }
-        const event = new CustomEvent('show_content', { detail: secretKey });
-        document.dispatchEvent(event);
-        myModal.hide()
-      }
-      e.preventDefault()
-      e.stopPropagation();
-    });
-  })
-
   function decrypt(ciphertext, key) {
     const decryptData = CryptoJS.AES.decrypt(ciphertext, CryptoJS.enc.Utf8.parse(key), {
       iv: CryptoJS.enc.Utf8.parse('{{ $.Site.Params.secretIv }}'),
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7
     });
-    const originalText = decryptData.toString(CryptoJS.enc.Utf8);
-    return originalText;
+    try {
+      const originalText = decryptData.toString(CryptoJS.enc.Utf8);
+      return originalText;
+    } catch(e) {
+      console.log("解密失败", e)
+    }
+    return null;
   }
 </script>
-
-<!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5">密码验证</h1>
-      </div>
-      <div class="modal-body">
-        <form id="validationForm" class="row g-3 needs-validation" novalidate>
-          <div class="col-12">
-            <label for="validationPassword" class="form-label">密码</label>
-            <input type="text" class="form-control" id="validationPassword" required>
-            <div class="invalid-feedback">请输入有效的密码</div>
-          </div>
-          <div class="col-12" style="text-align: right;">
-            <button class="btn btn-primary" type="submit">确定</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
 {{- end -}}
 
 <div class="col ms-auto content-docs">
