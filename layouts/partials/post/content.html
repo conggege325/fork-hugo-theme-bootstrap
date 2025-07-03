@@ -2,15 +2,6 @@
 {{- if ne $isPrivate true -}}
     {{- $isPrivate = false -}}
 {{- end -}}
-<script>
-    function decrypt(ciphertext) {
-        const key = CryptoJS.enc.Utf8.parse('{{- $.Site.Params.secretKey -}}');
-        const iv = CryptoJS.enc.Utf8.parse('{{- $.Site.Params.secretIv -}}');
-        const decryptData = CryptoJS.AES.decrypt(ciphertext, key, {iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7});
-        const originalText = decryptData.toString(CryptoJS.enc.Utf8);
-        return originalText;
-    }
-</script>
 
 <div class="post-content mb-3" data-bs-spy="scroll" data-bs-target="#TableOfContents" tabindex="0">
     {{- if and .Summary (default false $.Site.Params.post.readMoreFromContent) (hasPrefix .Content .Summary) }}

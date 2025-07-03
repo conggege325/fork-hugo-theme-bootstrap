@@ -1,3 +1,8 @@
+{{- $isPrivate := .Params.isPrivate -}}
+{{- if ne $isPrivate true -}}
+  {{- $isPrivate = false -}}
+{{- end -}}
+
 {{- if partial "functions/toc" . -}}
 <div class="accordion post-toc d-none d-lg-block">
   <div class="accordion-item row mb-4 card component" id="postTOC">
@@ -8,7 +13,17 @@
       </a>
     </div>
     <div class="card-body collapse accordion-collapse accordion-body d-lg-block" id="post-toc">
-      {{ .TableOfContents }}
+      {{ if $isPrivate -}}
+        <script>
+          {{ $tableContent := .TableOfContents | string -}}
+          const tableContentText = '{{- aes_enc $tableContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
+          const directoryText = decrypt(tableContentText)
+          console.log(directoryText)
+          $('#post-toc').append(directoryText)
+        </script>
+      {{ else }}
+        {{ .TableOfContents }}
+      {{ end -}}
     </div>
   </div>
 </div>
