@@ -1,8 +1,44 @@
+{{- $isPrivate := .Params.isPrivate -}}
+{{- if ne $isPrivate true -}}
+    {{- $isPrivate = false -}}
+{{- end -}}
+<script>
+    function decrypt(ciphertext) {
+        const key = CryptoJS.enc.Utf8.parse('{{- $.Site.Params.secretKey -}}');
+        const iv = CryptoJS.enc.Utf8.parse('{{- $.Site.Params.secretIv -}}');
+        const decryptData = CryptoJS.AES.decrypt(ciphertext, key, {iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7});
+        const originalText = decryptData.toString(CryptoJS.enc.Utf8);
+        return originalText;
+    }
+</script>
+
 <div class="post-content mb-3" data-bs-spy="scroll" data-bs-target="#TableOfContents" tabindex="0">
     {{- if and .Summary (default false $.Site.Params.post.readMoreFromContent) (hasPrefix .Content .Summary) }}
         <div id="post-summary">{{ .Summary }}</div>
-        <div id="post-content-body">{{- strings.TrimPrefix .Summary .Content | safeHTML -}}</div>
+        <div id="post-content-body">
+            {{- if $isPrivate -}}
+                <script>
+                    {{- $safeContent := strings.TrimPrefix .Summary .Content | safeHTML | string -}}
+                    const ciphertext = '{{- aes_enc $safeContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
+                    const originalText = decrypt(ciphertext)
+                    $('#post-content-body').append(originalText)
+                </script>
+            {{- else -}}
+                {{- strings.TrimPrefix .Summary .Content | safeHTML -}}
+            {{- end -}}
+        </div>
     {{- else }}
-        <div id="post-content-body">{{ .Content }}</div>
+        <div id="post-content-body">
+            {{- if $isPrivate -}}
+                <script>
+                    {{- $unsafeContent := .Content | string -}}
+                    const ciphertext = '{{- aes_enc $unsafeContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
+                    const originalText = decrypt(ciphertext)
+                    $('#post-content-body').append(originalText)
+                </script>
+            {{- else -}}
+                {{ .Content }}
+            {{- end -}}
+        </div>
     {{- end }}
 </div>
