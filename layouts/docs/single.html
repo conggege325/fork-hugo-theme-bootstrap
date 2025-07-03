@@ -3,14 +3,6 @@
 
 {{- if eq .Params.isPrivate true -}}
 <script>
-  let key = '{{ $.Site.Params.secretKey }}';
-  let keyLength = {{ len $.Site.Params.secretKey }};
-  let iv = '{{ $.Site.Params.secretIv }}';
-  if (keyLength > 32) {
-    key = key.substring(0, 32)
-  } else if(keyLength < 32) {
-    key = key.padEnd(32, '0')
-  }
   let myModal;
   $(function() {
     myModal = new bootstrap.Modal('#staticBackdrop', {
@@ -19,9 +11,9 @@
     myModal.show()
   })
 
-  function decrypt(ciphertext) {
+  function decrypt(ciphertext, key) {
     const decryptData = CryptoJS.AES.decrypt(ciphertext, CryptoJS.enc.Utf8.parse(key), {
-      iv: CryptoJS.enc.Utf8.parse(iv),
+      iv: CryptoJS.enc.Utf8.parse('{{ $.Site.Params.secretIv }}'),
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7
     });
@@ -30,9 +22,15 @@
   }
 
   function mySubmit () {
-    myModal.hide()
-    const event = new CustomEvent('show_content', { remark: 'Show content.' });
+    let secretKey = 'congGG325';
+    if (secretKey.length > 32) {
+      secretKey = secretKey.substring(0, 32)
+    } else if(secretKey.length < 32) {
+      secretKey = secretKey.padEnd(32, '0')
+    }
+    const event = new CustomEvent('show_content', { detail: secretKey });
     document.dispatchEvent(event);
+    myModal.hide()
   }
 </script>
 

@@ -11,8 +11,8 @@
                 <script>
                     {{- $safeContent := strings.TrimPrefix .Summary .Content | safeHTML | string -}}
                     const ciphertext = '{{- aes_enc $safeContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
-                    const originalText = decrypt(ciphertext)
                     document.addEventListener('show_content', function(e) {
+                        const originalText = decrypt(ciphertext, e.detail)
                         $('#post-content-body').append(originalText)
                     });
                 </script>
@@ -26,8 +26,8 @@
                 <script>
                     {{- $unsafeContent := .Content | string -}}
                     const ciphertext = '{{- aes_enc $unsafeContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
-                    const originalText = decrypt(ciphertext)
                     document.addEventListener('show_content', function(e) {
+                        const originalText = decrypt(ciphertext, e.detail)
                         $('#post-content-body').append(originalText)
                     });
                 </script>
