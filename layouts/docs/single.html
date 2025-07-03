@@ -3,15 +3,15 @@
 
 {{- if eq .Params.isPrivate true -}}
 <script>
-  var key = '{{ $.Site.Params.secretKey }}';
-  var keyLength = {{ len $.Site.Params.secretKey }};
-  var iv = '{{ $.Site.Params.secretIv }}';
+  let key = '{{ $.Site.Params.secretKey }}';
+  let keyLength = {{ len $.Site.Params.secretKey }};
+  let iv = '{{ $.Site.Params.secretIv }}';
   if (keyLength > 32) {
     key = key.substring(0, 32)
   } else if(keyLength < 32) {
     key = key.padEnd(32, '0')
   }
-  var myModal;
+  let myModal;
   $(function() {
     myModal = new bootstrap.Modal('#staticBackdrop', {
       keyboard: false
@@ -31,8 +31,8 @@
 
   function mySubmit () {
     myModal.hide()
-    $('#post-content-body').append(originalText)
-    $('#post-toc').append(directoryText)
+    const event = new CustomEvent('show_content', { remark: 'Show content.' });
+    document.dispatchEvent(event);
   }
 </script>
 
