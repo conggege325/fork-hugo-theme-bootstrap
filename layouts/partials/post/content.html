@@ -1,14 +1,5 @@
 {{ $passwd := .Params.passwd | default "" }}
 
-<div class="position-fixed top-0 start-50 translate-middle-x" style="z-index: 99999; padding-top: 10px;">
-    <div id="passwd_error_toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
-        <div class="alert alert-danger" role="alert" style="margin: 0;">
-            <h6 class="alert-heading">密码错误!</h6>
-            <div>您无权查看该文章。</div>
-        </div>
-    </div>
-</div>
-
 <div class="post-content mb-3" data-bs-spy="scroll" data-bs-target="#TableOfContents" tabindex="0">
     {{- if and .Summary (default false $.Site.Params.post.readMoreFromContent) (hasPrefix .Content .Summary) }}
     <div id="post-summary">{{ .Summary }}</div>
@@ -35,8 +26,20 @@
             document.addEventListener('show_content', function(e) {
                 const originalText = decrypt(ciphertext, e.detail)
                 if (originalText == null) {
-                    const toast = new bootstrap.Toast(document.getElementById('passwd_error_toast'));
-                    toast.show();
+                    layer.open({
+                        type: 1,
+                        offset: ['16px', 'calc(50% - 100px)'],
+                        id: 'layer-password-error', // 防止重复弹出
+                        title: false,
+                        content: `<div class="alert alert-danger alert-dismissible" role="alert" style=" border-radius: 0; margin: 0; padding-top: 5px; padding-bottom: 5px; padding-left: 10px;">
+                        <div class="alert-heading" style="font-weight: bolder;">密码错误!</div>
+                        <div>您无权查看该文章。</div>
+                        <button type="button" class="btn-close" style="padding: 5px;" onclick="layer.closeAll()"></button>
+                      </div>`,
+                        closeBtn: 0,
+                        shade: 0, // 不显示遮罩
+                        time: 3000,
+                    });
                 } else {
                     $('#post-content-body').append(originalText)
                     $('.secret_content').hide()
@@ -88,8 +91,20 @@
             document.addEventListener('show_content', function(e) {
                 const originalText = decrypt(ciphertext, e.detail)
                 if (originalText == null) {
-                    const toast = new bootstrap.Toast(document.getElementById('passwd_error_toast'));
-                    toast.show();
+                    layer.open({
+                        type: 1,
+                        offset: ['16px', 'calc(50% - 100px)'],
+                        id: 'layer-password-error', // 防止重复弹出
+                        title: false,
+                        content: `<div class="alert alert-danger alert-dismissible" role="alert" style=" border-radius: 0; margin: 0; padding-top: 5px; padding-bottom: 5px; padding-left: 10px;">
+                        <div class="alert-heading" style="font-weight: bolder;">密码错误!</div>
+                        <div>您无权查看该文章。</div>
+                        <button type="button" class="btn-close" style="padding: 5px;" onclick="layer.closeAll()"></button>
+                      </div>`,
+                        closeBtn: 0,
+                        shade: 0, // 不显示遮罩
+                        time: 3000,
+                    });
                 } else {
                     $('#post-content-body').append(originalText)
                     $('.secret_content').hide()
