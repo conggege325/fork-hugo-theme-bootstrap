@@ -9,6 +9,23 @@
       keyboard: false
     })
     myModal.show()
+
+    $("#validationForm").submit(function(e) {
+      const form = e.target
+      if (form.checkValidity()) {
+        let secretKey = $('#validationPassword')[0].value;
+        if (secretKey.length > 32) {
+          secretKey = secretKey.substring(0, 32)
+        } else if(secretKey.length < 32) {
+          secretKey = secretKey.padEnd(32, '0')
+        }
+        const event = new CustomEvent('show_content', { detail: secretKey });
+        document.dispatchEvent(event);
+        myModal.hide()
+      }
+      e.preventDefault()
+      e.stopPropagation();
+    });
   })
 
   function decrypt(ciphertext, key) {
@@ -20,18 +37,6 @@
     const originalText = decryptData.toString(CryptoJS.enc.Utf8);
     return originalText;
   }
-
-  function mySubmit () {
-    let secretKey = 'congGG325';
-    if (secretKey.length > 32) {
-      secretKey = secretKey.substring(0, 32)
-    } else if(secretKey.length < 32) {
-      secretKey = secretKey.padEnd(32, '0')
-    }
-    const event = new CustomEvent('show_content', { detail: secretKey });
-    document.dispatchEvent(event);
-    myModal.hide()
-  }
 </script>
 
 <!-- Modal -->
@@ -39,13 +44,19 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">请输入密码</h1>
+        <h1 class="modal-title fs-5">密码验证</h1>
       </div>
       <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" onclick="mySubmit()">确定</button>
+        <form id="validationForm" class="row g-3 needs-validation" novalidate>
+          <div class="col-12">
+            <label for="validationPassword" class="form-label">密码</label>
+            <input type="text" class="form-control" id="validationPassword" required>
+            <div class="invalid-feedback">请输入有效的密码</div>
+          </div>
+          <div class="col-12" style="text-align: right;">
+            <button class="btn btn-primary" type="submit">确定</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
