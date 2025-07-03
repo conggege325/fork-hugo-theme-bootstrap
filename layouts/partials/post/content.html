@@ -10,9 +10,8 @@
             {{- if $isPrivate -}}
                 <script>
                     {{- $safeContent := strings.TrimPrefix .Summary .Content | safeHTML | string -}}
-                    const ciphertext = '{{- aes_enc $safeContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
-                    const originalText = decrypt(ciphertext)
-                    $('#post-content-body').append(originalText)
+                    var ciphertext = '{{- aes_enc $safeContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
+                    var originalText = decrypt(ciphertext)
                 </script>
             {{- else -}}
                 {{- strings.TrimPrefix .Summary .Content | safeHTML -}}
@@ -23,9 +22,8 @@
             {{- if $isPrivate -}}
                 <script>
                     {{- $unsafeContent := .Content | string -}}
-                    const ciphertext = '{{- aes_enc $unsafeContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
-                    const originalText = decrypt(ciphertext)
-                    $('#post-content-body').append(originalText)
+                    var ciphertext = '{{- aes_enc $unsafeContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
+                    var originalText = decrypt(ciphertext)
                 </script>
             {{- else -}}
                 {{ .Content }}

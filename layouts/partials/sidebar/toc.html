@@ -16,10 +16,8 @@
       {{ if $isPrivate -}}
         <script>
           {{ $tableContent := .TableOfContents | string -}}
-          const tableContentText = '{{- aes_enc $tableContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
-          const directoryText = decrypt(tableContentText)
-          console.log(directoryText)
-          $('#post-toc').append(directoryText)
+          var tableContentText = '{{- aes_enc $tableContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
+          var directoryText = decrypt(tableContentText)
         </script>
       {{ else }}
         {{ .TableOfContents }}

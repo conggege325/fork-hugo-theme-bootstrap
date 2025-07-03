@@ -1,5 +1,7 @@
 {{ define "content" }}
 {{- partial "docs/nav" . -}}
+
+{{- if eq .Params.isPrivate true -}}
 <script>
   var key = '{{ $.Site.Params.secretKey }}';
   var keyLength = {{ len $.Site.Params.secretKey }};
@@ -9,6 +11,14 @@
   } else if(keyLength < 32) {
     key = key.padEnd(32, '0')
   }
+  var myModal;
+  $(function() {
+    myModal = new bootstrap.Modal('#staticBackdrop', {
+      keyboard: false
+    })
+    myModal.show()
+  })
+
   function decrypt(ciphertext) {
     const decryptData = CryptoJS.AES.decrypt(ciphertext, CryptoJS.enc.Utf8.parse(key), {
       iv: CryptoJS.enc.Utf8.parse(iv),
@@ -18,7 +28,32 @@
     const originalText = decryptData.toString(CryptoJS.enc.Utf8);
     return originalText;
   }
+
+  function mySubmit () {
+    myModal.hide()
+    $('#post-content-body').append(originalText)
+    $('#post-toc').append(directoryText)
+  }
 </script>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">请输入密码</h1>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="mySubmit()">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+{{- end -}}
+
 <div class="col ms-auto content-docs">
   <div class="container-fluid">
     {{- partial "breadcrumb" . -}}
