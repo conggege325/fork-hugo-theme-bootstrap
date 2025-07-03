@@ -1,10 +1,20 @@
 {{ define "content" }}
 {{- partial "docs/nav" . -}}
 <script>
+  var key = '{{ $.Site.Params.secretKey }}';
+  var keyLength = {{ len $.Site.Params.secretKey }};
+  var iv = '{{ $.Site.Params.secretIv }}';
+  if (keyLength > 32) {
+    key = key.substring(0, 32)
+  } else if(keyLength < 32) {
+    key = key.padEnd(32, '0')
+  }
   function decrypt(ciphertext) {
-    const key = CryptoJS.enc.Utf8.parse('{{- $.Site.Params.secretKey -}}');
-    const iv = CryptoJS.enc.Utf8.parse('{{- $.Site.Params.secretIv -}}');
-    const decryptData = CryptoJS.AES.decrypt(ciphertext, key, {iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7});
+    const decryptData = CryptoJS.AES.decrypt(ciphertext, CryptoJS.enc.Utf8.parse(key), {
+      iv: CryptoJS.enc.Utf8.parse(iv),
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7
+    });
     const originalText = decryptData.toString(CryptoJS.enc.Utf8);
     return originalText;
   }
