@@ -19,7 +19,9 @@
           const tableContentText = '{{- aes_enc $tableContent $.Site.Params.secretKey $.Site.Params.secretIv -}}'
           document.addEventListener('show_content', function(e) {
             const directoryText = decrypt(tableContentText, e.detail)
-            $('#post-toc').append(directoryText)
+            if (directoryText != null) {
+              $('#post-toc').append(directoryText)
+            }
           });
         </script>
       {{ else }}
