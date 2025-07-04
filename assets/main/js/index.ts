@@ -1,4 +1,5 @@
-import "bootstrap/dist/js/bootstrap.bundle";
+import * as bootstrap from "bootstrap/dist/js/bootstrap.bundle";
+window.bootstrap = bootstrap;
 
 import ActionsPanel from "js/actions-panel";
 import App from "js/app";

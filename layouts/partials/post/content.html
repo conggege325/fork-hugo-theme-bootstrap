@@ -1,5 +1,15 @@
 {{ $passwd := .Params.passwd | default "" }}
 
+<div class="toast-container position-fixed start-50 translate-middle-x" style="top: 1.5em;">
+    <div id="password_error_toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+        <div class="toast-header">
+            <strong class="me-auto">密码错误!</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" >您无权查看该文章。</div>
+    </div>
+</div>
+
 <div class="post-content mb-3" data-bs-spy="scroll" data-bs-target="#TableOfContents" tabindex="0">
     {{- if and .Summary (default false $.Site.Params.post.readMoreFromContent) (hasPrefix .Content .Summary) }}
     <div id="post-summary">{{ .Summary }}</div>
@@ -23,29 +33,20 @@
         <script>
             {{- $safeContent := strings.TrimPrefix .Summary .Content | safeHTML | string -}}
             const ciphertext = '{{- aes_enc $safeContent .Params.passwd $.Site.Params.secretIv -}}'
-            document.addEventListener('show_content', function(e) {
-                const originalText = decrypt(ciphertext, e.detail)
-                if (originalText == null) {
-                    layer.open({
-                        type: 1,
-                        offset: ['16px', 'calc(50% - 100px)'],
-                        id: 'layer-password-error', // 防止重复弹出
-                        title: false,
-                        content: `<div class="alert alert-danger alert-dismissible" role="alert" style=" border-radius: 0; margin: 0; padding-top: 5px; padding-bottom: 5px; padding-left: 10px;">
-                        <div class="alert-heading" style="font-weight: bolder;">密码错误!</div>
-                        <div>您无权查看该文章。</div>
-                        <button type="button" class="btn-close" style="padding: 5px;" onclick="layer.closeAll()"></button>
-                      </div>`,
-                        closeBtn: 0,
-                        shade: 0, // 不显示遮罩
-                        time: 3000,
-                    });
-                } else {
-                    $('#post-content-body').append(originalText)
-                    $('.secret_content').hide()
-                }
-            });
+
             $(function() {
+                const toast = new bootstrap.Toast(document.getElementById('password_error_toast'))
+
+                document.addEventListener('show_content', function(e) {
+                    const originalText = decrypt(ciphertext, e.detail)
+                    if (originalText == null) {
+                        toast.show()
+                    } else {
+                        $('#post-content-body').append(originalText)
+                        $('.secret_content').hide()
+                    }
+                });
+
                 $("#validationForm").submit(function(e) {
                     const form = e.target
                     if (form.checkValidity()) {
@@ -88,29 +89,20 @@
         <script>
             {{- $unsafeContent := .Content | string -}}
             const ciphertext = '{{- aes_enc $unsafeContent .Params.passwd $.Site.Params.secretIv -}}'
-            document.addEventListener('show_content', function(e) {
-                const originalText = decrypt(ciphertext, e.detail)
-                if (originalText == null) {
-                    layer.open({
-                        type: 1,
-                        offset: ['16px', 'calc(50% - 100px)'],
-                        id: 'layer-password-error', // 防止重复弹出
-                        title: false,
-                        content: `<div class="alert alert-danger alert-dismissible" role="alert" style=" border-radius: 0; margin: 0; padding-top: 5px; padding-bottom: 5px; padding-left: 10px;">
-                        <div class="alert-heading" style="font-weight: bolder;">密码错误!</div>
-                        <div>您无权查看该文章。</div>
-                        <button type="button" class="btn-close" style="padding: 5px;" onclick="layer.closeAll()"></button>
-                      </div>`,
-                        closeBtn: 0,
-                        shade: 0, // 不显示遮罩
-                        time: 3000,
-                    });
-                } else {
-                    $('#post-content-body').append(originalText)
-                    $('.secret_content').hide()
-                }
-            });
+
             $(function() {
+                const toast = new bootstrap.Toast(document.getElementById('password_error_toast'))
+
+                document.addEventListener('show_content', function(e) {
+                    const originalText = decrypt(ciphertext, e.detail)
+                    if (originalText == null) {
+                        toast.show()
+                    } else {
+                        $('#post-content-body').append(originalText)
+                        $('.secret_content').hide()
+                    }
+                });
+
                 $("#validationForm").submit(function(e) {
                     const form = e.target
                     if (form.checkValidity()) {
