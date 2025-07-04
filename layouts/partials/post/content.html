@@ -10,7 +10,7 @@
     </div>
 </div>
 
-<div class="post-content mb-3" data-bs-spy="scroll" data-bs-target="#TableOfContents" tabindex="0">
+<div id="post_of_content" class="post-content mb-3" data-bs-spy="scroll" data-bs-target="#TableOfContents" tabindex="0">
     {{- if and .Summary (default false $.Site.Params.post.readMoreFromContent) (hasPrefix .Content .Summary) }}
     <div id="post-summary">{{ .Summary }}</div>
     <div id="post-content-body">
@@ -44,6 +44,7 @@
                     } else {
                         $('#post-content-body').append(originalText)
                         $('.secret_content').hide()
+                        new bootstrap.ScrollSpy(document.getElementById('post_of_content'), { target: '#TableOfContents' })
                     }
                 });
 
@@ -100,6 +101,7 @@
                     } else {
                         $('#post-content-body').append(originalText)
                         $('.secret_content').hide()
+                        new bootstrap.ScrollSpy(document.getElementById('post_of_content'), { target: '#TableOfContents' })
                     }
                 });
 
